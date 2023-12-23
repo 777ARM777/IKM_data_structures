@@ -10,9 +10,6 @@
 #include <stack>
 #include <queue>
 
-#include <stack>
-#include <queue>
-
 template <typename T>
 class BinaryTree
 {
