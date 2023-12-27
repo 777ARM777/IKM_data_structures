@@ -40,10 +40,14 @@ public:
     int countOfLeavesR() const; // Recursive
     int countOfLeavesI() const; // Iterative
 
+
     int heightR() const;
     int widthR() const;
     int height_preorderI() const;
+    int height_levelorderI() const;
+    
 
+    void maxCountLevelR() const;
 
     void clearR();
 
@@ -52,6 +56,12 @@ public:
     void maxOfLevelR() const;
 
     void maxCountLevelI() const;
+    int sumOfAboveIthLevel() const;
+
+    bool isFullTreeR() const;
+    bool isFullTreeI() const;
+    BinaryTree<T> copy() const;
+
 
 private:
     Node<T>* insertHelper(Node<T>* p, const  T& d);
@@ -73,10 +83,14 @@ private:
     int countOfLeavesHelper(Node<T>* p) const;
 
     int heightHelper(Node<T>* p) const;
+
     void clearHelper(Node<T>* p);
 
     // Tomser
     T maxOfLevelHelper(Node<T>* p, int level) const;
+    void maxCountLevelHelper(Node<T>* p, int level, int& maxCount, std::vector<int>& result) const;
+
+    bool isFullTreeHelper(Node<T>* p) const;
 
 private:
     Node<T>* m_root;
@@ -408,8 +422,47 @@ void BinaryTree<T>::levelorder() const
 }
 
 template <typename T>
+int BinaryTree<T>::height_levelorderI() const
+{
+    std::queue<Node<T>*> q;
+    if (!m_root)
+    {
+        return -1;
+    }
+    q.push(m_root);
+    int height = -1;
+
+    while (!q.empty())
+    {
+        height++;
+        const int s = q.size();
+        for (int i = 0; i < s; i++)
+        {
+            Node<T>* p = q.front();
+            q.pop();
+
+            if (p->left)
+            {
+                q.push(p->left);
+            }
+
+            if (p->right)
+            {
+                q.push(p->right);
+            }
+        }
+    }
+    return height;
+}
+
+
+template <typename T>
 int BinaryTree<T>::height_preorderI() const
 {
+    if (!m_root)
+    {
+        return -1;
+    }
     std::stack<Node<T>*> s;
     std::stack<int> heights;
     Node<T>* p = m_root;
@@ -889,4 +942,135 @@ void BinaryTree<T>::maxCountLevelI() const
     std::cout << std::endl;
 }
 
+template <typename T>
+int BinaryTree<T>::sumOfAboveIthLevel() const
+{z
+}
+
 // Ռեկուրսիվ եղանակով արտածել տրված բինար ծառի այն մակարդակների համարները, որոնցում կան ամենաշատ թվով գագաթներ
+template <typename T>
+void BinaryTree<T>::maxCountLevelR() const
+{
+    if (!m_root)
+    {
+        std::cout << "The tree is empty." << std::endl;
+        return;
+    }
+
+    int maxCount = 0;
+    std::vector<int> result;
+    maxCountLevelHelper(m_root, 0, maxCount, result);
+
+    for (size_t i = 0; i < result.size(); ++i)
+    {
+        if (result[i] == maxCount)
+        {
+            std::cout << i << " ";
+        }
+    }
+    std::cout << std::endl;
+}
+
+
+template <typename T>
+void BinaryTree<T>::maxCountLevelHelper(Node<T>* p, int level, int& maxCount, std::vector<int>& result) const
+{
+    if (!p)
+    {
+        return;
+    }
+
+    if (level == result.size())
+    {
+        result.push_back(0);
+    }
+
+    result[level]++;
+
+    if (result[level] > maxCount)
+    {
+        maxCount = result[level];
+    }
+
+    maxCountLevelHelper(p->left, level + 1, maxCount, result);
+    maxCountLevelHelper(p->right, level + 1, maxCount, result);
+}
+
+template <typename T>
+bool BinaryTree<T>::isFullTreeI() const
+{
+    std::queue <Node<T>*> q;
+    if (!m_root)
+    {
+        return true;
+    }
+
+    q.push(m_root);
+    Node<T>* p;
+    BinaryTree<T> res;
+    while (!q.empty())
+    {
+        p = q.front();
+        q.pop();
+
+        if (p->left && !p->right || !p->left && p->right)
+        {
+            return false;
+        }
+
+        if (p->left)
+        {
+            q.push(p->left);
+        }
+        if (p->right)
+        {
+            q.push(p->right);
+        }
+    }
+
+    return true;
+}
+
+template <typename T>
+bool BinaryTree<T>::isFullTreeR() const
+{
+    return isFullTreeHelper(m_root);
+}
+
+template <typename T>
+bool BinaryTree<T>::isFullTreeHelper(Node<T>* p) const
+{
+    if (!p) return true;
+
+    if (!isFullTreeHelper(p->left) || !isFullTreeHelper(p->right)) return false;
+
+    return (p->left && p->right || !p->left && !p->right);
+
+}
+
+template <typename T>
+BinaryTree<T> BinaryTree<T>::copy() const
+{
+    std::queue <Node<T>*> q;
+    q.push(m_root);
+    Node<T>* p;
+    BinaryTree<T> res;
+    while (!q.empty())
+    {
+        p = q.front();
+        q.pop();
+
+        res.insertI(p->data);
+
+        if (p->left)
+        {
+            q.push(p->left);
+        }
+        if (p->right)
+        {
+            q.push(p->right);
+        }
+    }
+
+    return res;
+}

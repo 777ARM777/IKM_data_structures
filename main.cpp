@@ -29,13 +29,13 @@ int main()
     tree.insertI(10);
     tree.insertR(30);
     tree.insertR(9);
-//    tree.insertI(15);
+    tree.insertI(15);
     tree.insertR(18);
 //    tree.insertR(7);
-    tree.insertI(25);
+//    tree.insertI(25);
 //    tree.insertI(7);
-    tree.insertR(15);
-    tree.insertR(16);
+//    tree.insertR(15);
+    tree.insertR(14);
 
 
 //     Tomser main
@@ -57,14 +57,14 @@ int main()
 //    std::cout <<"\npreorder recoursive: ";
 //    tree.preorderR();
 //
-//    std::cout << "\npreorder iterative:  ";
-//    tree.preorderI();
+    std::cout << "\npreorder iterative:  ";
+    tree.preorderI();
 //
 //    std::cout << "\ninorder recoursive: ";
 //    tree.inorderR();
 //
-//    std::cout << "\ninorder iterative:  ";
-//    tree.inorderI();
+    std::cout << "\ninorder iterative:  ";
+    tree.inorderI();
 //
 //    std::cout << "\npostorder recoursive: ";
 //    tree.postorderR();
@@ -80,6 +80,7 @@ int main()
 //
     std::cout << "\nHeight of Tree: " << tree.heightR();
     std::cout << "\nHeightPreorderI of Tree: " << tree.height_preorderI();
+    std::cout << "\nheightLevelorderI of Tree: " << tree.height_levelorderI();
 //    std::cout << "\nWidth of Tree: " << tree.widthR();
 //    std::cout << "\nMax of Tree: " << tree.findMaxI();
 //    std::cout << "\nMin of Tree: " << tree.findMinR();
@@ -102,6 +103,29 @@ int main()
 //
 //    std::cout << "\npostorder after clearing: ";
 //    tree.postorderR();
+
+//    std::cout << "\nMax data at level Iterative: ";
+//    tree.maxOfLevelI();
+//    std::cout << "\nMax data at level Recursive: ";
+//    tree.maxOfLevelR();
+//
+//    std::cout << "\nLevels with the maximum count Iterative: ";
+//    tree.maxCountLevelI();
+//    std::cout << "\nLevels with the maximum count Recursive: ";
+//    tree.maxCountLevelR();
+//
+    std::cout << "\nTree is fullR: " << std::boolalpha << tree.isFullTreeR();
+    std::cout << "\nTree is fullI: " << std::boolalpha << tree.isFullTreeI();
+
+//
+//    BinaryTree<int> c = tree.copy();
+//
+//    std::cout << "\npreorder iterative:  ";
+//    c.preorderI();
+//
+//    std::cout << "\ninorder iterative:  ";
+//    c.inorderI();
+
 
     return 0;
 }
