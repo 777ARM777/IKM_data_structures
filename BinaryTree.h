@@ -1,7 +1,3 @@
-//
-// Created by Dell on 11/14/2023.
-// Mijankyal Start 733 line
-
 #pragma once
 
 #include "Node.h"
@@ -46,6 +42,8 @@ public:
 
     int heightR() const;
     int widthR() const;
+    int height_preorderI() const;
+
 
     void clearR();
 
@@ -151,7 +149,10 @@ bool BinaryTree<T>::containsR(const T& data) const
 template <typename T>
 Node<T>* BinaryTree<T>::findR(Node<T>* p, const T& data) const
 {
-    if (!p) return nullptr;
+    if (!p)
+    {
+        return nullptr;
+    }
 
     if (data < p->data)
     {
@@ -199,7 +200,9 @@ void BinaryTree<T>::inorderR() const
 template <typename T>
 void BinaryTree<T>::inorderHelper(Node<T>* p) const
 {
-    if (!p) return;
+    if (!p) {
+        return;
+    }
 
     inorderHelper(p->left);
     std::cout << p->data << " ";
@@ -385,9 +388,10 @@ void BinaryTree<T>::levelorder() const
 {
     std::queue <Node<T>*> q;
     q.push(m_root);
+    Node<T>* p;
     while (!q.empty())
     {
-        Node<T>* p = q.front();
+        p = q.front();
         q.pop();
 
         std::cout << p->data << ' ';
@@ -400,6 +404,50 @@ void BinaryTree<T>::levelorder() const
         {
             q.push(p->right);
         }
+    }
+}
+
+template <typename T>
+int BinaryTree<T>::height_preorderI() const
+{
+    std::stack<Node<T>*> s;
+    std::stack<int> heights;
+    Node<T>* p = m_root;
+    int height = 0;
+    int current = 0;
+
+    while (true)
+    {
+        while (p)
+        {
+            if (p->right)
+            {
+                s.push(p->right);
+                heights.push(current + 1);
+            }
+
+            p = p->left;
+            if (p)
+            {
+                current++;
+            }
+        }
+
+        if (current > height)
+        {
+            height = current;
+        }
+
+        if (s.empty())
+        {
+            return height;
+        }
+
+        p = s.top();
+        s.pop();
+
+        current = heights.top();
+        heights.pop();
     }
 }
 
