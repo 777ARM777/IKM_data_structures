@@ -1,7 +1,3 @@
-//
-// Created by Dell on 11/14/2023.
-// Mijankyal Start 733 line
-
 #pragma once
 
 #include "Node.h"
@@ -44,8 +40,14 @@ public:
     int countOfLeavesR() const; // Recursive
     int countOfLeavesI() const; // Iterative
 
+
     int heightR() const;
     int widthR() const;
+    int height_preorderI() const;
+    int height_levelorderI() const;
+
+
+    void maxCountLevelR() const;
 
     void clearR();
 
@@ -54,6 +56,33 @@ public:
     void maxOfLevelR() const;
 
     void maxCountLevelI() const;
+    int sumOfAboveIthLevel(int i) const;
+    int sumOfAboveIthLevelR(int level) const;
+
+    int countNodesWithTwoChildrenR() const;
+    int countNodesWithTwoChildrenI() const;
+
+
+    bool isFullTreeR() const;
+    bool isFullTreeI() const;
+    BinaryTree<T> copy() const;
+
+    void minOfLevelI() const;
+    void minOfLevelR() const;
+
+    int countNodesWithOneChildI() const;
+    int countNodesWithOneChildR() const;
+
+    void printLeavesInorderI() const;
+    void printLeavesInorderR() const;
+
+    void levelsWithZeroNodesInorderI() const;
+    void levelsWithZeroNodesInorderR() const;
+
+    int nullsLevelorderI(T data) const;
+    int nullsLevelorderR(T data) const;
+
+
 
 private:
     Node<T>* insertHelper(Node<T>* p, const  T& d);
@@ -75,10 +104,25 @@ private:
     int countOfLeavesHelper(Node<T>* p) const;
 
     int heightHelper(Node<T>* p) const;
+
     void clearHelper(Node<T>* p);
 
+
+private:
     // Tomser
     T maxOfLevelHelper(Node<T>* p, int level) const;
+    void maxCountLevelHelper(Node<T>* p, int level, int& maxCount, std::vector<int>& result) const;
+
+    bool isFullTreeHelper(Node<T>* p) const;
+    int countNodesWithTwoChildrenHelper(Node<T>* p) const;
+    int countNodesWithOneChildHelper(Node<T>* p) const;
+    void printLeavesInorderHelper(Node<T>* p) const;
+    T minOfLevelHelper(Node<T>* p, int level) const;
+    void levelsWithZeroNodesInorderHelper(Node<T>* p, int level) const;
+    int nullsLevelorderHelper(Node<T>* p, int level, T data) const;
+    int sumOfAboveIthLevelHelper(Node<T>* p, int level) const;
+
+
 
 private:
     Node<T>* m_root;
@@ -151,7 +195,10 @@ bool BinaryTree<T>::containsR(const T& data) const
 template <typename T>
 Node<T>* BinaryTree<T>::findR(Node<T>* p, const T& data) const
 {
-    if (!p) return nullptr;
+    if (!p)
+    {
+        return nullptr;
+    }
 
     if (data < p->data)
     {
@@ -199,7 +246,9 @@ void BinaryTree<T>::inorderR() const
 template <typename T>
 void BinaryTree<T>::inorderHelper(Node<T>* p) const
 {
-    if (!p) return;
+    if (!p) {
+        return;
+    }
 
     inorderHelper(p->left);
     std::cout << p->data << " ";
@@ -385,9 +434,10 @@ void BinaryTree<T>::levelorder() const
 {
     std::queue <Node<T>*> q;
     q.push(m_root);
+    Node<T>* p;
     while (!q.empty())
     {
-        Node<T>* p = q.front();
+        p = q.front();
         q.pop();
 
         std::cout << p->data << ' ';
@@ -400,6 +450,89 @@ void BinaryTree<T>::levelorder() const
         {
             q.push(p->right);
         }
+    }
+}
+
+template <typename T>
+int BinaryTree<T>::height_levelorderI() const
+{
+    std::queue<Node<T>*> q;
+    if (!m_root)
+    {
+        return -1;
+    }
+    q.push(m_root);
+    int height = -1;
+
+    while (!q.empty())
+    {
+        height++;
+        const int s = q.size();
+        for (int i = 0; i < s; i++)
+        {
+            Node<T>* p = q.front();
+            q.pop();
+
+            if (p->left)
+            {
+                q.push(p->left);
+            }
+
+            if (p->right)
+            {
+                q.push(p->right);
+            }
+        }
+    }
+    return height;
+}
+
+
+template <typename T>
+int BinaryTree<T>::height_preorderI() const
+{
+    if (!m_root)
+    {
+        return -1;
+    }
+    std::stack<Node<T>*> s;
+    std::stack<int> heights;
+    Node<T>* p = m_root;
+    int height = 0;
+    int current = 0;
+
+    while (true)
+    {
+        while (p)
+        {
+            if (p->right)
+            {
+                s.push(p->right);
+                heights.push(current + 1);
+            }
+
+            p = p->left;
+            if (p)
+            {
+                current++;
+            }
+        }
+
+        if (current > height)
+        {
+            height = current;
+        }
+
+        if (s.empty())
+        {
+            return height;
+        }
+
+        p = s.top();
+        s.pop();
+
+        current = heights.top();
+        heights.pop();
     }
 }
 
@@ -841,4 +974,551 @@ void BinaryTree<T>::maxCountLevelI() const
     std::cout << std::endl;
 }
 
+template <typename T>
+int BinaryTree<T>::sumOfAboveIthLevel(int i) const
+{
+    std::queue <Node<T>*> q;
+    T sum = 0;
+    int count = 0;
+    q.push(m_root);
+    while (!q.empty() and count <= i)
+    {
+        int size = q.size();
+        for(int i = 0; i < size; ++i)
+        {
+            Node<T> *p = q.front();
+            q.pop();;
+            sum += p->data;
+
+            if (p->left) {
+                q.push(p->left);
+            }
+            if (p->right) {
+                q.push(p->right);
+            }
+        }
+        count++;
+    }
+    return sum;
+}
+
 // Ռեկուրսիվ եղանակով արտածել տրված բինար ծառի այն մակարդակների համարները, որոնցում կան ամենաշատ թվով գագաթներ
+template <typename T>
+void BinaryTree<T>::maxCountLevelR() const
+{
+    if (!m_root)
+    {
+        std::cout << "The tree is empty." << std::endl;
+        return;
+    }
+
+    int maxCount = 0;
+    std::vector<int> result;
+    maxCountLevelHelper(m_root, 0, maxCount, result);
+
+    for (size_t i = 0; i < result.size(); ++i)
+    {
+        if (result[i] == maxCount)
+        {
+            std::cout << i << " ";
+        }
+    }
+    std::cout << std::endl;
+}
+
+
+template <typename T>
+void BinaryTree<T>::maxCountLevelHelper(Node<T>* p, int level, int& maxCount, std::vector<int>& result) const
+{
+    if (!p)
+    {
+        return;
+    }
+
+    if (level == result.size())
+    {
+        result.push_back(0);
+    }
+
+    result[level]++;
+
+    if (result[level] > maxCount)
+    {
+        maxCount = result[level];
+    }
+
+    maxCountLevelHelper(p->left, level + 1, maxCount, result);
+    maxCountLevelHelper(p->right, level + 1, maxCount, result);
+}
+
+template <typename T>
+bool BinaryTree<T>::isFullTreeI() const
+{
+    std::queue <Node<T>*> q;
+    if (!m_root)
+    {
+        return true;
+    }
+
+    q.push(m_root);
+    Node<T>* p;
+    BinaryTree<T> res;
+    while (!q.empty())
+    {
+        p = q.front();
+        q.pop();
+
+        if (p->left && !p->right || !p->left && p->right)
+        {
+            return false;
+        }
+
+        if (p->left)
+        {
+            q.push(p->left);
+        }
+        if (p->right)
+        {
+            q.push(p->right);
+        }
+    }
+
+    return true;
+}
+
+template <typename T>
+bool BinaryTree<T>::isFullTreeR() const
+{
+    return isFullTreeHelper(m_root);
+}
+
+template <typename T>
+bool BinaryTree<T>::isFullTreeHelper(Node<T>* p) const
+{
+    if (!p) return true;
+
+    if (!isFullTreeHelper(p->left) || !isFullTreeHelper(p->right)) return false;
+
+    return (p->left && p->right || !p->left && !p->right);
+
+}
+
+template <typename T>
+BinaryTree<T> BinaryTree<T>::copy() const
+{
+    std::queue <Node<T>*> q;
+    q.push(m_root);
+    Node<T>* p;
+    BinaryTree<T> res;
+    while (!q.empty())
+    {
+        p = q.front();
+        q.pop();
+
+        res.insertI(p->data);
+
+        if (p->left)
+        {
+            q.push(p->left);
+        }
+        if (p->right)
+        {
+            q.push(p->right);
+        }
+    }
+
+    return res;
+}
+
+// Ոչ ռեկուրսիվ եղանակով  գտնել տրված բինար ծառի 2 որդի ունեցող հանգույցների քանակը
+template <typename T>
+int BinaryTree<T>::countNodesWithTwoChildrenI() const
+{
+    if (!m_root)
+    {
+        return 0;
+    }
+
+    int count = 0;
+    std::queue<Node<T>*> q;
+    q.push(m_root);
+
+    while (!q.empty())
+    {
+        Node<T>* current = q.front();
+        q.pop();
+
+        if (current->left && current->right)
+        {
+            count++;
+        }
+
+        if (current->left)
+        {
+            q.push(current->left);
+        }
+
+        if (current->right)
+        {
+            q.push(current->right);
+        }
+    }
+
+    return count;
+}
+
+// Ռեկուրսիվ եղանակով  գտնել տրված բինար ծառի 2 որդի ունեցող հանգույցների քանակը
+template <typename T>
+int BinaryTree<T>::countNodesWithTwoChildrenR()const
+{
+    return countNodesWithTwoChildrenHelper(m_root);
+}
+
+template <typename T>
+int BinaryTree<T>::countNodesWithTwoChildrenHelper(Node<T>* p) const
+{
+    if (!p) return 0;
+
+    return ((p->left && p->right) ? 1 : 0) + countNodesWithTwoChildrenHelper(p->left) + countNodesWithTwoChildrenHelper(p->right);
+}
+
+// Ոչ ռեկուրսիվ եղանակով  գտնել տրված բինար ծառի 1 որդի ունեցող հանգույցների քանակը
+template <typename T>
+int BinaryTree<T>::countNodesWithOneChildI() const
+{
+    if (!m_root)
+    {
+        return 0;
+    }
+
+    int count = 0;
+    std::queue<Node<T>*> q;
+    q.push(m_root);
+
+    while (!q.empty())
+    {
+        Node<T>* current = q.front();
+        q.pop();
+
+        if ((current->left && !current->right) || (!current->left && current->right))
+        {
+            count++;
+        }
+
+        if (current->left)
+        {
+            q.push(current->left);
+        }
+        if (current->right)
+        {
+            q.push(current->right);
+        }
+    }
+
+    return count;
+}
+
+//Ռեկուրսիվ եղանակով  գտնել տրված բինար ծառի 1 որդի ունեցող հանգույցների քանակը
+template <typename T>
+int BinaryTree<T>::countNodesWithOneChildR() const
+{
+    return countNodesWithOneChildHelper(m_root);
+}
+
+template <typename T>
+int BinaryTree<T>::countNodesWithOneChildHelper(Node<T>* p) const
+{
+    return (!p) ? 0 : (((p->left && !p->right) || (!p->left && p->right)) ? 1 : 0) + countNodesWithOneChildHelper(p->left) + countNodesWithOneChildHelper(p->right);
+}
+
+// Տպել տրված բինար ծառի տերևներում պարունակվող արժեքները, կատարելով ծառի սիմետրիկ շրջանցում՝ ոչ ռեկուրսիվ եղանակով
+template <typename T>
+void BinaryTree<T>::printLeavesInorderI() const
+{
+    if (!m_root)
+    {
+        return;
+    }
+
+    std::stack<Node<T>*> stack;
+    Node<T>* current = m_root;
+
+    while (current || !stack.empty())
+    {
+        while (current)
+        {
+            stack.push(current);
+            current = current->left;
+        }
+
+        current = stack.top();
+        stack.pop();
+
+        if (!current->left && !current->right)
+        {
+            std::cout << current->data << " ";
+        }
+
+        current = current->right;
+    }
+
+    std::cout << std::endl;
+}
+
+// Տպել տրված բինար ծառի տերևներում պարունակվող արժեքները, կատարելով ծառի սիմետրիկ շրջանցում՝ ռեկուրսիվ եղանակով
+template <typename T>
+void BinaryTree<T>::printLeavesInorderR() const
+{
+    if (!m_root)
+    {
+        return;
+    }
+
+    printLeavesInorderHelper(m_root);
+    std::cout << std::endl;
+}
+
+template <typename T>
+void BinaryTree<T>::printLeavesInorderHelper(Node<T>* p) const
+{
+    if (!p)
+    {
+        return;
+    }
+
+    printLeavesInorderHelper(p->left);
+
+    if (!p->left && !p->right)
+    {
+        std::cout << p->data << " ";
+    }
+
+    printLeavesInorderHelper(p->right);
+}
+
+// Ոչ Ռեկուրսիվ եղանակով արտածել տրված դրական տարրերով ծառի յուրաքանչյուր մակարդակում պարունակվող փոքրագույն տարրը
+template <typename T>
+void BinaryTree<T>::minOfLevelI() const
+{
+    std::queue<Node<T>*> q;
+    q.push(m_root);
+
+    while (!q.empty())
+    {
+        int size = q.size();
+        T min_level = INT_MAX;
+        for (int i = 0; i < size; ++i)
+        {
+            Node<T>* p = q.front();
+            q.pop();
+
+            if (p->data < min_level)
+            {
+                min_level = p->data;
+            }
+
+            if (p->left)
+            {
+                q.push(p->left);
+            }
+            if (p->right)
+            {
+                q.push(p->right);
+            }
+        }
+
+        std::cout << min_level << ' ';
+    }
+}
+
+// Ռեկուրսիվ եղանակով արտածել տրված դրական տարրերով ծառի յուրաքանչյուր մակարդակում պարունակվող փոքրագույն տարրը
+template <typename T>
+void BinaryTree<T>::minOfLevelR() const
+{
+    int level = heightR();
+    for (int i = 1; i <= level + 1; ++i)
+    {
+        std::cout << minOfLevelHelper(m_root, i) << ' ';
+    }
+    std::cout << std::endl;
+}
+
+template <typename T>
+T BinaryTree<T>::minOfLevelHelper(Node<T>* p, int level) const
+{
+    if (!p)
+    {
+        return INT_MAX;
+    }
+    if (level == 1)
+    {
+        return p->data;
+    }
+    T left_min = minOfLevelHelper(p->left, level - 1);
+    T right_min = minOfLevelHelper(p->right, level - 1);
+    return std::min(left_min, right_min);
+}
+
+// Ոչ ռեկուրսիվ եղանակով գտնել բինար ծառի այն մակարդակների համարները, որոնք պարունակում են զրոյական արժեքով հանգույցմեր
+template <typename T>
+void BinaryTree<T>::levelsWithZeroNodesInorderI() const
+{
+    if (!m_root)
+    {
+        return;
+    }
+
+    std::queue<Node<T>*> nodesQueue;
+    nodesQueue.push(m_root);
+
+    std::queue<int> levelsQueue;
+    levelsQueue.push(0);
+
+    while (!nodesQueue.empty())
+    {
+        Node<T>* current = nodesQueue.front();
+        nodesQueue.pop();
+
+        int current_level = levelsQueue.front();
+        levelsQueue.pop();
+
+        if (current->left)
+        {
+            nodesQueue.push(current->left);
+            levelsQueue.push(current_level + 1);
+        }
+
+        if (current->data == 0)
+        {
+            std::cout << current_level << " ";
+        }
+
+        if (current->right)
+        {
+            nodesQueue.push(current->right);
+            levelsQueue.push(current_level);
+        }
+    }
+}
+
+// ռեկուրսիվ եղանակով գտնել բինար ծառի այն մակարդակների համարները, որոնք պարունակում են զրոյական արժեքով հանգույցմեր
+template <typename T>
+void BinaryTree<T>::levelsWithZeroNodesInorderR() const
+{
+    if (!m_root)
+    {
+        return;
+    }
+
+    levelsWithZeroNodesInorderHelper(m_root, 0);
+    std::cout << std::endl;
+}
+
+template <typename T>
+void BinaryTree<T>::levelsWithZeroNodesInorderHelper(Node<T>* p, int level) const
+{
+    if (!p)
+    {
+        return;
+    }
+
+    levelsWithZeroNodesInorderHelper(p->left, level + 1);
+
+    if (p->data == 0)
+    {
+        std::cout << level << " ";
+    }
+
+    levelsWithZeroNodesInorderHelper(p->right, level + 1);
+}
+
+template <typename T>
+int BinaryTree<T>::nullsLevelorderI(T data) const
+{
+    std::queue<Node<T>*> q;
+    q.push(m_root);
+    int count = 0;
+
+    while (!q.empty())
+    {
+        int size = q.size();
+        for (int i = 0; i < size; ++i)
+        {
+            Node<T>* p = q.front();
+            q.pop();
+
+            if (!p)
+            {
+                count++;
+                q.push(nullptr);
+                q.push(nullptr);
+                continue;
+            }
+
+            if (p->data == data)
+            {
+                return count;
+            }
+
+            q.push(p->left);
+            q.push(p->right);
+        }
+    }
+}
+
+
+template <typename T>
+int BinaryTree<T>::nullsLevelorderR(T data) const
+{
+    int level = heightR();
+    int count = 0;
+    for (int i = 1; i <= level + 1; ++i)
+    {
+        count += nullsLevelorderHelper(m_root, i, data);
+    }
+    return count;
+}
+
+template <typename T>
+int BinaryTree<T>::nullsLevelorderHelper(Node<T>* p, int level, T data) const
+{
+    if (!p) {
+        return 0;
+    }
+    if (level == 1)
+    {
+        return (p->data == data) ? 1 : 0;
+    }
+
+    int left_count = nullsLevelorderHelper(p->left, level - 1, data);
+    int right_count = nullsLevelorderHelper(p->right, level - 1, data);
+    return left_count + right_count;
+}
+
+
+template <typename T>
+int BinaryTree<T>::sumOfAboveIthLevelR(int level) const
+{
+    int count = 0;
+    for (int i = 1; i <= level + 1; ++i)
+    {
+        count += sumOfAboveIthLevelHelper(m_root, i);
+    }
+    return count;
+}
+
+template <typename T>
+int BinaryTree<T>::sumOfAboveIthLevelHelper(Node<T>* p,  int level) const
+{
+    if (!p) {
+        return 0;
+    }
+    if (level == 1)
+    {
+        return p->data;
+    }
+
+    int left_count = sumOfAboveIthLevelHelper(p->left, level - 1);
+    int right_count = sumOfAboveIthLevelHelper(p->right, level - 1);
+    return left_count + right_count;
+}
